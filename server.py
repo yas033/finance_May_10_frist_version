@@ -13,6 +13,7 @@ from quanttool.live import DEFAULT_WATCHLIST, LiveMarketScanner, clean_symbols
 
 ROOT = Path(__file__).resolve().parent
 WEB_ROOT = ROOT / "web"
+STATIC_ROOTS = (WEB_ROOT, ROOT)
 SCANNER = LiveMarketScanner()
 
 
@@ -34,6 +35,20 @@ class QuantHandler(SimpleHTTPRequestHandler):
                 }
             )
             return
+        if parsed.path == "/api/health":
+            self.write_json(
+                {
+                    "static_roots": [
+                        {
+                            "path": str(root),
+                            "exists": root.exists(),
+                            "files": sorted(item.name for item in root.iterdir()) if root.exists() else [],
+                        }
+                        for root in STATIC_ROOTS
+                    ],
+                }
+            )
+            return
 
         self.serve_static(parsed.path)
 
@@ -47,8 +62,8 @@ class QuantHandler(SimpleHTTPRequestHandler):
     def serve_static(self, path: str) -> None:
         if path in ("", "/"):
             path = "/index.html"
-        file_path = (WEB_ROOT / path.lstrip("/")).resolve()
-        if not str(file_path).startswith(str(WEB_ROOT.resolve())) or not file_path.exists():
+        file_path = self.find_static_file(path)
+        if file_path is None:
             self.send_error(404)
             return
 
@@ -58,6 +73,15 @@ class QuantHandler(SimpleHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(file_path.read_bytes())
+
+    def find_static_file(self, path: str) -> Path | None:
+        relative_path = path.lstrip("/")
+        for root in STATIC_ROOTS:
+            root_resolved = root.resolve()
+            file_path = (root / relative_path).resolve()
+            if str(file_path).startswith(str(root_resolved)) and file_path.exists() and file_path.is_file():
+                return file_path
+        return None
 
     def write_json(self, payload: dict[str, Any]) -> None:
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
@@ -77,7 +101,7 @@ def main() -> None:
     port = int(os.getenv("PORT", "8765"))
     server = ThreadingHTTPServer((host, port), QuantHandler)
     print(f"Quant Stock Tool running at http://{host}:{port}")
-    print(f"Static root: {WEB_ROOT} exists={WEB_ROOT.exists()}")
+    print(f"Static roots: {', '.join(f'{root} exists={root.exists()}' for root in STATIC_ROOTS)}")
     server.serve_forever()
 
 

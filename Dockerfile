@@ -9,6 +9,7 @@ WORKDIR /app
 COPY server.py pyproject.toml README.md ./
 COPY quanttool ./quanttool
 COPY web ./web
+COPY web/app.js web/styles.css ./
 COPY examples ./examples
 COPY tests ./tests
 
