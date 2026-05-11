@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import mimetypes
 import os
+import time
 import urllib.parse
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -15,6 +16,9 @@ ROOT = Path(__file__).resolve().parent
 WEB_ROOT = ROOT / "web"
 STATIC_ROOTS = (WEB_ROOT, ROOT)
 SCANNER = LiveMarketScanner()
+SCAN_RATE_LIMIT = 180
+RATE_LIMIT_WINDOW_SECONDS = 60
+SCAN_REQUESTS_BY_IP: dict[str, list[float]] = {}
 
 
 class QuantHandler(SimpleHTTPRequestHandler):
@@ -27,25 +31,7 @@ class QuantHandler(SimpleHTTPRequestHandler):
             self.write_json(
                 {
                     "watchlist": DEFAULT_WATCHLIST,
-                    "api_keys": {
-                        "alpha_vantage": bool(SCANNER.alpha_key),
-                        "polygon": bool(SCANNER.polygon_key),
-                        "finnhub": bool(SCANNER.finnhub_key),
-                    },
-                }
-            )
-            return
-        if parsed.path == "/api/health":
-            self.write_json(
-                {
-                    "static_roots": [
-                        {
-                            "path": str(root),
-                            "exists": root.exists(),
-                            "files": sorted(item.name for item in root.iterdir()) if root.exists() else [],
-                        }
-                        for root in STATIC_ROOTS
-                    ],
+                    "providers": ["Yahoo Finance", "Alpha Vantage", "Polygon", "Finnhub"],
                 }
             )
             return
@@ -53,11 +39,31 @@ class QuantHandler(SimpleHTTPRequestHandler):
         self.serve_static(parsed.path)
 
     def handle_scan(self, query: str) -> None:
+        if self.is_rate_limited():
+            self.send_response(429)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Retry-After", "60")
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": "Rate limit exceeded"}).encode("utf-8"))
+            return
+
         params = urllib.parse.parse_qs(query)
         symbols_text = params.get("symbols", [""])[0]
         symbols = clean_symbols(symbols_text.split(",")) if symbols_text else DEFAULT_WATCHLIST
         limit = int(params.get("limit", ["30"])[0])
         self.write_json(SCANNER.scan(symbols, limit=limit))
+
+    def is_rate_limited(self) -> bool:
+        forwarded_for = self.headers.get("X-Forwarded-For", "")
+        ip_address = (forwarded_for.split(",")[0].strip() if forwarded_for else self.client_address[0]) or "unknown"
+        now = time.time()
+        recent = [stamp for stamp in SCAN_REQUESTS_BY_IP.get(ip_address, []) if now - stamp < RATE_LIMIT_WINDOW_SECONDS]
+        if len(recent) >= SCAN_RATE_LIMIT:
+            SCAN_REQUESTS_BY_IP[ip_address] = recent
+            return True
+        recent.append(now)
+        SCAN_REQUESTS_BY_IP[ip_address] = recent
+        return False
 
     def serve_static(self, path: str) -> None:
         if path in ("", "/"):
