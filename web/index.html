@@ -10,84 +10,90 @@
     <header class="topbar">
       <div>
         <p class="eyebrow">US Equities Live Scanner</p>
-        <h1>美股实时量化筛选</h1>
+        <h1 data-i18n="title">美股实时量化筛选</h1>
       </div>
-      <div class="market-clock">
-        <span id="clock">--:--:--</span>
-        <span id="freshness">等待数据</span>
+      <div class="header-actions">
+        <div class="language-toggle" aria-label="Language">
+          <button class="lang-option active" type="button" data-lang="zh">中文</button>
+          <button class="lang-option" type="button" data-lang="en">EN</button>
+        </div>
+        <div class="market-clock">
+          <span id="clock">--:--:--</span>
+          <span id="freshness" data-i18n="waiting">等待数据</span>
+        </div>
       </div>
     </header>
 
     <main class="layout">
       <section class="control-panel" aria-label="Scanner controls">
         <div class="field">
-          <label for="symbols">股票池</label>
+          <label for="symbols" data-i18n="watchlist">股票池</label>
           <textarea id="symbols" spellcheck="false"></textarea>
         </div>
         <div class="control-row">
-          <label for="limit">榜单数量</label>
+          <label for="limit" data-i18n="rankLimit">榜单数量</label>
           <input id="limit" type="number" min="5" max="100" value="30" />
         </div>
         <div class="control-row">
-          <label for="interval">刷新秒数</label>
+          <label for="interval" data-i18n="refreshSeconds">刷新秒数</label>
           <input id="interval" type="number" min="1" max="60" value="1" />
         </div>
         <div class="button-row">
-          <button id="scanNow" type="button" title="立即刷新">↻</button>
-          <button id="pause" type="button" title="暂停刷新">⏸</button>
+          <button id="scanNow" type="button" title="立即刷新" data-i18n-title="refreshNow">↻</button>
+          <button id="pause" type="button" title="暂停刷新" data-i18n-title="pauseRefresh">⏸</button>
         </div>
         <div class="alert-panel">
           <div class="panel-title">
-            <strong>Price alerts</strong>
-            <button id="notifyPermission" type="button" title="允许浏览器通知">🔔</button>
+            <strong data-i18n="priceAlerts">价格警报</strong>
+            <button id="notifyPermission" type="button" title="允许浏览器通知" data-i18n-title="allowNotifications">🔔</button>
           </div>
           <div class="alert-grid">
-            <input id="alertSymbol" type="text" placeholder="Symbol" />
+            <input id="alertSymbol" type="text" placeholder="股票代码" data-i18n-placeholder="symbolPlaceholder" />
             <select id="alertSide" aria-label="Alert side">
-              <option value="buy">Buy</option>
-              <option value="sell">Sell</option>
+              <option value="buy" data-i18n="buy">买入</option>
+              <option value="sell" data-i18n="sell">卖出</option>
             </select>
             <select id="alertCondition" aria-label="Alert condition">
               <option value="<=">≤</option>
               <option value=">=">≥</option>
             </select>
-            <input id="alertPrice" type="number" step="0.01" min="0" placeholder="Price" />
+            <input id="alertPrice" type="number" step="0.01" min="0" placeholder="价格" data-i18n-placeholder="pricePlaceholder" />
           </div>
-          <button id="addAlert" class="wide-button" type="button">Add alert</button>
+          <button id="addAlert" class="wide-button" type="button" data-i18n="addAlert">添加警报</button>
           <div id="alerts" class="alerts-list"></div>
         </div>
         <div class="glossary-panel" aria-label="Beginner glossary">
           <div class="panel-title">
-            <strong>新手词典</strong>
+            <strong data-i18n="glossary">新手词典</strong>
           </div>
           <div class="term-list">
-            <div><strong>VWAP</strong><span>当天平均成本线，价格在它上方通常更强。</span></div>
-            <div><strong>回踩</strong><span>先涨后回落，等它跌回关键位置附近再观察。</span></div>
-            <div><strong>横盘企稳</strong><span>价格在小范围里走，不再明显往下掉。</span></div>
-            <div><strong>不追高</strong><span>刚冲太快时先别急，等回落或确认。</span></div>
-            <div><strong>失效线</strong><span>跌破这里，原来的买入理由先取消。</span></div>
-            <div><strong>分批止盈</strong><span>涨到目标区先卖一部分，别一次赌到底。</span></div>
+            <div><strong>VWAP</strong><span data-i18n="termVwap">当天平均成本线，价格在它上方通常更强。</span></div>
+            <div><strong data-i18n="termPullbackName">回踩</strong><span data-i18n="termPullback">先涨后回落，等它跌回关键位置附近再观察。</span></div>
+            <div><strong data-i18n="termBaseName">横盘企稳</strong><span data-i18n="termBase">价格在小范围里走，不再明显往下掉。</span></div>
+            <div><strong data-i18n="termNoChaseName">不追高</strong><span data-i18n="termNoChase">刚冲太快时先别急，等回落或确认。</span></div>
+            <div><strong data-i18n="termRiskName">失效线</strong><span data-i18n="termRisk">跌破这里，原来的买入理由先取消。</span></div>
+            <div><strong data-i18n="termScaleName">分批止盈</strong><span data-i18n="termScale">涨到目标区先卖一部分，别一次赌到底。</span></div>
           </div>
         </div>
         <div class="provider-list" id="providers"></div>
         <div class="notice">
-          <strong>说明</strong>
-          <p>评分是强弱排序，不是第二天 100% 上涨概率。买卖区间是观察建议，不是收益保证或下单指令。</p>
+          <strong data-i18n="noticeTitle">说明</strong>
+          <p data-i18n="noticeBody">评分是强弱排序，不是第二天 100% 上涨概率。买卖区间是观察建议，不是收益保证或下单指令。</p>
         </div>
       </section>
 
       <section class="scanner">
         <div class="summary-band">
           <div>
-            <span class="metric-label">股票池</span>
+            <span class="metric-label" data-i18n="watchlist">股票池</span>
             <strong id="universeSize">0</strong>
           </div>
           <div>
-            <span class="metric-label">Top pick</span>
+            <span class="metric-label" data-i18n="topPick">最佳观察</span>
             <strong id="topPick">--</strong>
           </div>
           <div>
-            <span class="metric-label">信号强度</span>
+            <span class="metric-label" data-i18n="signalStrength">信号强度</span>
             <strong id="topScore">--</strong>
           </div>
         </div>
@@ -97,24 +103,24 @@
           <table>
             <thead>
               <tr>
-                <th>Rank</th>
-                <th>Symbol</th>
-                <th>Price</th>
-                <th>Today</th>
-                <th>Momentum score</th>
-                <th>Entry window</th>
-                <th>Buy zone</th>
-                <th>Sell zone</th>
-                <th>Macro reason</th>
-                <th>Latest news</th>
-                <th>Signal</th>
-                <th>Trend</th>
-                <th>Reasons</th>
+                <th data-i18n="rank">排名</th>
+                <th data-i18n="symbol">股票</th>
+                <th data-i18n="price">价格</th>
+                <th data-i18n="today">今日</th>
+                <th data-i18n="momentumScore">动量分</th>
+                <th data-i18n="entryWindow">买入时段</th>
+                <th data-i18n="buyZone">买入位置</th>
+                <th data-i18n="sellZone">卖出区间</th>
+                <th data-i18n="macroReason">大盘/热点理由</th>
+                <th data-i18n="latestNews">相关新闻</th>
+                <th data-i18n="signal">信号</th>
+                <th data-i18n="trend">走势</th>
+                <th data-i18n="reasons">理由</th>
               </tr>
             </thead>
             <tbody id="rankings">
               <tr>
-                <td colspan="8" class="empty">正在加载实时榜单...</td>
+                <td colspan="13" class="empty" data-i18n="loadingRankings">正在加载实时榜单...</td>
               </tr>
             </tbody>
           </table>

@@ -5,6 +5,7 @@ const state = {
   alerts: loadAlerts(),
   audioContext: null,
   newsSlides: {},
+  lang: localStorage.getItem("quant-lang") || "zh",
 };
 
 const els = {
@@ -28,9 +29,183 @@ const els = {
   universeSize: document.querySelector("#universeSize"),
   topPick: document.querySelector("#topPick"),
   topScore: document.querySelector("#topScore"),
+  langOptions: document.querySelectorAll("[data-lang]"),
 };
 
+const I18N = {
+  zh: {
+    title: "美股实时量化筛选",
+    waiting: "等待数据",
+    watchlist: "股票池",
+    rankLimit: "榜单数量",
+    refreshSeconds: "刷新秒数",
+    refreshNow: "立即刷新",
+    pauseRefresh: "暂停刷新",
+    resumeRefresh: "继续刷新",
+    priceAlerts: "价格警报",
+    allowNotifications: "允许浏览器通知",
+    symbolPlaceholder: "股票代码",
+    pricePlaceholder: "价格",
+    buy: "买入",
+    sell: "卖出",
+    addAlert: "添加警报",
+    glossary: "新手词典",
+    termVwap: "当天平均成本线，价格在它上方通常更强。",
+    termPullbackName: "回踩",
+    termPullback: "先涨后回落，等它跌回关键位置附近再观察。",
+    termBaseName: "横盘企稳",
+    termBase: "价格在小范围里走，不再明显往下掉。",
+    termNoChaseName: "不追高",
+    termNoChase: "刚冲太快时先别急，等回落或确认。",
+    termRiskName: "失效线",
+    termRisk: "跌破这里，原来的买入理由先取消。",
+    termScaleName: "分批止盈",
+    termScale: "涨到目标区先卖一部分，别一次赌到底。",
+    noticeTitle: "说明",
+    noticeBody: "评分是强弱排序，不是第二天 100% 上涨概率。买卖区间是观察建议，不是收益保证或下单指令。",
+    topPick: "最佳观察",
+    signalStrength: "信号强度",
+    rank: "排名",
+    symbol: "股票",
+    price: "价格",
+    today: "今日",
+    momentumScore: "动量分",
+    entryWindow: "买入时段",
+    buyZone: "买入位置",
+    sellZone: "卖出区间",
+    macroReason: "大盘/热点理由",
+    latestNews: "相关新闻",
+    signal: "信号",
+    trend: "走势",
+    reasons: "理由",
+    loadingRankings: "正在加载实时榜单...",
+    loading: "刷新中...",
+    refreshFailed: "刷新失败",
+    connectionFailed: "连接失败",
+    noQuotes: "没有拿到行情。请检查网络或 API Key。",
+    noMacro: "暂无宏观新闻",
+    noNews: "暂无相关新闻",
+    score: "分数",
+    previousNews: "上一条新闻",
+    nextNews: "下一条新闻",
+    resetAlert: "重新启用",
+    deleteAlert: "删除",
+    noAlerts: "没有警报",
+    triggered: "已触发",
+    armed: "监控中",
+    notificationUnsupported: "当前浏览器不支持系统通知",
+    notificationOn: "价格警报通知已开启",
+    notificationOff: "通知未开启，仍会页面内提示",
+    beginnerTip: "新手看法",
+    originalTerm: "原术语",
+    unclassified: "未分类",
+  },
+  en: {
+    title: "US Stock Live Quant Scanner",
+    waiting: "Waiting for data",
+    watchlist: "Watchlist",
+    rankLimit: "Rank limit",
+    refreshSeconds: "Refresh seconds",
+    refreshNow: "Refresh now",
+    pauseRefresh: "Pause refresh",
+    resumeRefresh: "Resume refresh",
+    priceAlerts: "Price alerts",
+    allowNotifications: "Allow browser notifications",
+    symbolPlaceholder: "Symbol",
+    pricePlaceholder: "Price",
+    buy: "Buy",
+    sell: "Sell",
+    addAlert: "Add alert",
+    glossary: "Beginner glossary",
+    termVwap: "Intraday average cost line. Price above it often means stronger demand.",
+    termPullbackName: "Pullback",
+    termPullback: "A stock rises, then falls back near a key level before you consider it.",
+    termBaseName: "Base",
+    termBase: "Price moves sideways in a tight range and stops falling aggressively.",
+    termNoChaseName: "No chase",
+    termNoChase: "Do not buy into a fast spike; wait for a pullback or confirmation.",
+    termRiskName: "Invalidation line",
+    termRisk: "If price breaks below this level, the bullish idea is no longer valid.",
+    termScaleName: "Scale out",
+    termScale: "Sell part of the position near the target zone instead of betting all at once.",
+    noticeTitle: "Note",
+    noticeBody: "Scores rank relative strength. They are not a 100% next-day guarantee. Buy/sell zones are observation guides, not trading instructions.",
+    topPick: "Top pick",
+    signalStrength: "Signal strength",
+    rank: "Rank",
+    symbol: "Symbol",
+    price: "Price",
+    today: "Today",
+    momentumScore: "Momentum score",
+    entryWindow: "Entry window",
+    buyZone: "Buy zone",
+    sellZone: "Sell zone",
+    macroReason: "Macro reason",
+    latestNews: "Latest news",
+    signal: "Signal",
+    trend: "Trend",
+    reasons: "Reasons",
+    loadingRankings: "Loading live rankings...",
+    loading: "Refreshing...",
+    refreshFailed: "Refresh failed",
+    connectionFailed: "Connection failed",
+    noQuotes: "No quotes received. Check network or API keys.",
+    noMacro: "No macro headlines loaded",
+    noNews: "No recent headline",
+    score: "score",
+    previousNews: "Previous headline",
+    nextNews: "Next headline",
+    resetAlert: "Reset",
+    deleteAlert: "Delete",
+    noAlerts: "No alerts",
+    triggered: "Triggered",
+    armed: "Armed",
+    notificationUnsupported: "This browser does not support system notifications",
+    notificationOn: "Price alert notifications are enabled",
+    notificationOff: "Notifications are off; in-page alerts will still work",
+    beginnerTip: "Beginner read",
+    originalTerm: "Original term",
+    unclassified: "Unclassified",
+  },
+};
+
+function t(key) {
+  return I18N[state.lang]?.[key] || I18N.zh[key] || key;
+}
+
+function setLanguage(lang) {
+  if (!I18N[lang] || state.lang === lang) {
+    return;
+  }
+  state.lang = lang;
+  localStorage.setItem("quant-lang", lang);
+  applyLanguage();
+  if (state.lastData) {
+    render(state.lastData);
+  } else {
+    renderAlerts();
+  }
+}
+
+function applyLanguage() {
+  document.documentElement.lang = state.lang === "zh" ? "zh-CN" : "en";
+  document.querySelectorAll("[data-i18n]").forEach((node) => {
+    node.textContent = t(node.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-title]").forEach((node) => {
+    node.title = t(node.dataset.i18nTitle);
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {
+    node.placeholder = t(node.dataset.i18nPlaceholder);
+  });
+  els.langOptions.forEach((button) => {
+    button.classList.toggle("active", button.dataset.lang === state.lang);
+  });
+  els.pause.title = state.paused ? t("resumeRefresh") : t("pauseRefresh");
+}
+
 async function init() {
+  applyLanguage();
   const config = await fetchJson("/api/config");
   els.symbols.value = config.watchlist.join(", ");
   bindEvents();
@@ -45,7 +220,7 @@ function bindEvents() {
   els.pause.addEventListener("click", () => {
     state.paused = !state.paused;
     els.pause.textContent = state.paused ? "▶" : "⏸";
-    els.pause.title = state.paused ? "继续刷新" : "暂停刷新";
+    els.pause.title = state.paused ? t("resumeRefresh") : t("pauseRefresh");
     schedule();
   });
   els.interval.addEventListener("change", schedule);
@@ -54,6 +229,9 @@ function bindEvents() {
   els.notifyPermission.addEventListener("click", requestNotificationPermission);
   els.addAlert.addEventListener("click", addAlert);
   els.rankings.addEventListener("click", handleNewsNav);
+  els.langOptions.forEach((button) => {
+    button.addEventListener("click", () => setLanguage(button.dataset.lang));
+  });
 }
 
 function schedule() {
@@ -72,7 +250,7 @@ function schedule() {
 
 async function scan() {
   try {
-    els.freshness.textContent = "刷新中...";
+    els.freshness.textContent = t("loading");
     const params = new URLSearchParams({
       symbols: els.symbols.value,
       limit: els.limit.value || "30",
@@ -81,8 +259,8 @@ async function scan() {
     state.lastData = data;
     render(data);
   } catch (error) {
-    els.freshness.textContent = "刷新失败";
-    els.providers.innerHTML = `<div class="provider"><span class="dot fail"></span><div>连接失败<br><small>${escapeHtml(error.message)}</small></div></div>`;
+    els.freshness.textContent = t("refreshFailed");
+    els.providers.innerHTML = `<div class="provider"><span class="dot fail"></span><div>${escapeHtml(t("connectionFailed"))}<br><small>${escapeHtml(error.message)}</small></div></div>`;
   }
 }
 
@@ -131,7 +309,7 @@ function renderProviders(providers) {
 
 function renderMarketContext(items) {
   if (!items.length) {
-    els.marketContext.innerHTML = `<span class="muted">No macro headlines loaded</span>`;
+    els.marketContext.innerHTML = `<span class="muted">${escapeHtml(t("noMacro"))}</span>`;
     return;
   }
   els.marketContext.innerHTML = items
@@ -153,7 +331,7 @@ function renderMarketContext(items) {
 
 function renderRankings(rows) {
   if (!rows.length) {
-    els.rankings.innerHTML = `<tr><td colspan="8" class="empty">没有拿到行情。请检查网络或 API Key。</td></tr>`;
+    els.rankings.innerHTML = `<tr><td colspan="13" class="empty">${escapeHtml(t("noQuotes"))}</td></tr>`;
     return;
   }
 
@@ -176,7 +354,7 @@ function renderRankings(rows) {
           <td>
             <strong>${Math.round(row.continuation_probability * 100)}/100</strong>
             <br />
-            <small>score ${row.score.toFixed(1)}</small>
+            <small>${escapeHtml(t("score"))} ${row.score.toFixed(1)}</small>
           </td>
           <td class="entry">
             <strong>${escapeHtml(entry.action)}</strong>
@@ -196,11 +374,11 @@ function renderRankings(rows) {
             <small>${escapeHtml(sellZone.trigger)}</small>
             <em>${escapeHtml(sellZone.tip)}</em>
           </td>
-          <td class="macro-cell">${escapeHtml(row.macro_reason || "No clear macro theme")}</td>
+          <td class="macro-cell">${escapeHtml(macroText(row.macro_reason || "No clear macro theme"))}</td>
           <td class="news-cell">${newsCell(row.symbol, row.news_items || (row.news ? [row.news] : []))}</td>
           <td><span class="pill ${signalClass}">${escapeHtml(signalText(row.signal))}</span></td>
           <td>${sparkline(row.sparkline, row.change_pct >= 0)}</td>
-          <td class="reasons">${escapeHtml(row.reasons.join(" · "))}</td>
+          <td class="reasons">${escapeHtml(row.reasons.map(reasonText).join(" · "))}</td>
         </tr>
       `;
     })
@@ -227,7 +405,100 @@ function handleNewsNav(event) {
 function explainEntryWindow(entry) {
   const label = entry.label || "";
   const vwapNote = plainText(entry.rationale || "");
-  const map = {
+  const map = entryWindowCopy();
+  const fallback = {
+    action: state.lang === "zh" ? "先观察，不急着下单" : "Observe first, do not rush",
+    time: plainText(entry.window || (state.lang === "zh" ? "等待更清晰的位置" : "Wait for a cleaner setup")),
+    reason: vwapNote || (state.lang === "zh" ? "系统还没有看到足够清晰的入场形态。" : "The system does not see a clean enough entry pattern yet."),
+    term: label ? `${t("originalTerm")}: ${label}` : `${t("originalTerm")}: ${t("unclassified")}`,
+  };
+  return map[label] || fallback;
+}
+
+function explainBuyZone(entry) {
+  const label = entry.label || "";
+  const trigger = entry.buy_zone?.trigger || "";
+  const map = buyZoneCopy();
+  return {
+    action: map[label]?.action || plainText(entry.buy_zone?.label || (state.lang === "zh" ? "观察区间" : "Observe zone")),
+    trigger: plainText(trigger),
+    tip: map[label]?.tip || `${t("beginnerTip")}: ${state.lang === "zh" ? "先等确认，不用急着抢第一秒。" : "Wait for confirmation; you do not need to catch the first second."}`,
+  };
+}
+
+function explainSellZone(entry) {
+  const trigger = entry.sell_zone?.trigger || "";
+  const risk = entry.sell_zone?.risk || "";
+  return {
+    risk: plainText(risk).replace("失效线", "跌破这里先退出"),
+    trigger: plainText(trigger),
+    tip:
+      state.lang === "zh"
+        ? "新手看法：到目标区可以分批卖；跌破失效线先保护本金。"
+        : "Beginner read: scale out near the target zone; protect capital if price breaks the invalidation line.",
+  };
+}
+
+function signalText(signal) {
+  const map =
+    state.lang === "zh"
+      ? {
+          "Strong watch": "重点观察",
+          Watch: "观察",
+          Weak: "偏弱",
+          Neutral: "中性",
+        }
+      : {
+          "Strong watch": "Strong watch",
+          Watch: "Watch",
+          Weak: "Weak",
+          Neutral: "Neutral",
+        };
+  return map[signal] || signal;
+}
+
+function entryWindowCopy() {
+  if (state.lang === "en") {
+    return {
+      "No chase": {
+        action: "Do not buy yet; wait for strength",
+        time: "Recheck after price climbs back above VWAP",
+        reason: "Today is weak, so chasing can easily buy the top of a bounce.",
+        term: "Original term: No chase",
+      },
+      "Wait for pullback": {
+        action: "Wait for the morning pullback to stabilize",
+        time: "Watch 10:00-11:30 ET",
+        reason: "If it opens high and fades, let the first wave of selling settle before judging support.",
+        term: "Original term: Pullback",
+      },
+      "VWAP pullback": {
+        action: "Wait near the VWAP average-cost line",
+        time: "Do not chase the high; wait for price near VWAP",
+        reason: "After a fast move, the cleaner entry usually comes from a controlled pullback.",
+        term: "Original term: VWAP pullback",
+      },
+      "Breakout confirm": {
+        action: "Wait for breakout confirmation",
+        time: "10:15-11:00 ET or 14:30-15:30 ET",
+        reason: "A breakout is cleaner when price retests the prior high and holds above it.",
+        term: "Original term: Breakout confirm",
+      },
+      "Midday base": {
+        action: "Wait for a stable midday base",
+        time: "11:00-13:30 ET",
+        reason: "Let price move sideways in a tight range and stop falling before looking for an upside push.",
+        term: "Original term: Midday base",
+      },
+      "Late confirm": {
+        action: "Wait for clearer late-day direction",
+        time: "14:30-15:45 ET",
+        reason: "The signal is not clean enough yet; late-day action often shows whether buyers want to hold overnight.",
+        term: "Original term: Late confirm",
+      },
+    };
+  }
+  return {
     "No chase": {
       action: "先别买，等重新转强",
       time: "价格重新站回平均成本线后再看",
@@ -265,19 +536,38 @@ function explainEntryWindow(entry) {
       term: "原术语：Late confirm",
     },
   };
-  const fallback = {
-    action: "先观察，不急着下单",
-    time: plainText(entry.window || "等待更清晰的位置"),
-    reason: vwapNote || "系统还没有看到足够清晰的入场形态。",
-    term: label ? `原术语：${label}` : "原术语：未分类",
-  };
-  return map[label] || fallback;
 }
 
-function explainBuyZone(entry) {
-  const label = entry.label || "";
-  const trigger = entry.buy_zone?.trigger || "";
-  const map = {
+function buyZoneCopy() {
+  if (state.lang === "en") {
+    return {
+      "No chase": {
+        action: "Only consider it after strength returns",
+        tip: "Beginner read: do not guess the bottom before price stabilizes.",
+      },
+      "VWAP pullback": {
+        action: "24-hour observation buy zone",
+        tip: "Beginner read: once price enters the zone, first check whether it stops falling.",
+      },
+      "Wait for pullback": {
+        action: "Consider it only after the pullback holds",
+        tip: "Beginner read: touching the zone is not enough; wait for price to turn back up.",
+      },
+      "Breakout confirm": {
+        action: "Consider it after the breakout retest holds",
+        tip: "Beginner read: avoid buying the exact moment it spikes.",
+      },
+      "Midday base": {
+        action: "Consider after midday stabilization",
+        tip: "Beginner read: first see whether price stops making new downside progress.",
+      },
+      "Late confirm": {
+        action: "Consider if it holds into the close",
+        tip: "Beginner read: when the signal is average, move less and wait for cleaner confirmation.",
+      },
+    };
+  }
+  return {
     "No chase": {
       action: "只在重新转强时考虑",
       tip: "新手看法：没站稳前不要提前猜底。",
@@ -303,34 +593,41 @@ function explainBuyZone(entry) {
       tip: "新手看法：信号普通时少动，等更确定。",
     },
   };
-  return {
-    action: map[label]?.action || plainText(entry.buy_zone?.label || "观察区间"),
-    trigger: plainText(trigger),
-    tip: map[label]?.tip || "新手看法：先等确认，不用急着抢第一秒。",
-  };
-}
-
-function explainSellZone(entry) {
-  const trigger = entry.sell_zone?.trigger || "";
-  const risk = entry.sell_zone?.risk || "";
-  return {
-    risk: plainText(risk).replace("失效线", "跌破这里先退出"),
-    trigger: plainText(trigger),
-    tip: "新手看法：到目标区可以分批卖；跌破失效线先保护本金。",
-  };
-}
-
-function signalText(signal) {
-  const map = {
-    "Strong watch": "重点观察",
-    Watch: "观察",
-    Weak: "偏弱",
-    Neutral: "中性",
-  };
-  return map[signal] || signal;
 }
 
 function plainText(value) {
+  if (state.lang === "en") {
+    return String(value || "")
+      .replaceAll("等待重新站上 VWAP 后再评估", "Wait until price reclaims VWAP before reassessing")
+      .replaceAll("美东", "ET")
+      .replaceAll("回踩确认", "pullback confirmation")
+      .replaceAll("回踩 VWAP 附近，不追高点", "Pull back near VWAP; do not chase the high")
+      .replaceAll("确认突破", "breakout confirmation")
+      .replaceAll("横盘企稳", "sideways base stabilization")
+      .replaceAll("尾盘确认", "late-day confirmation")
+      .replaceAll("当日走势偏弱，直接追入风险较高。", "Today is weak; chasing carries higher risk.")
+      .replaceAll("高开后回落，优先等开盘情绪释放后观察是否守住 VWAP/前低。", "If it opens high and fades, let opening pressure settle and check whether VWAP/support holds.")
+      .replaceAll("强势高开且价格偏离 VWAP，较好的位置通常来自回踩而不是尖峰追入。", "When price gaps strongly away from VWAP, a cleaner entry usually comes from a pullback rather than chasing the spike.")
+      .replaceAll("盘中趋势仍在抬高，可等突破后回踩不破再观察。", "Intraday trend is still lifting; wait for a breakout and a retest that holds.")
+      .replaceAll("走势偏强但不是极强，适合等午盘收敛后再看方向。", "The move is strong but not extreme; wait for midday consolidation before judging direction.")
+      .replaceAll("信号不够清晰，等待尾盘资金方向更稳。", "The signal is not clean enough; wait for late-day money flow to clarify.")
+      .replaceAll("当前距估算 VWAP", "Estimated distance from VWAP")
+      .replaceAll("等待实时价格恢复", "Wait for live price to recover")
+      .replaceAll("重新站上 VWAP 且 5-15 分钟不跌回", "Reclaim VWAP and hold it for 5-15 minutes")
+      .replaceAll("回踩区间内缩量企稳，随后放量转强", "Stabilize inside the pullback zone, then strengthen on higher volume")
+      .replaceAll("开盘回落后守住支撑，重新上穿短线均价", "Hold support after the opening pullback and reclaim the short-term average")
+      .replaceAll("突破前高后回踩不破，避免直接追最高点", "Break prior high, then retest and hold; avoid chasing the top")
+      .replaceAll("午盘窄幅整理后向上离开区间", "Leave a tight midday range to the upside")
+      .replaceAll("尾盘放量站稳当前价附近", "Hold near current price on stronger late-day volume")
+      .replaceAll("冲高靠近目标区可分批止盈；跌破买入区下沿/VWAP 减仓", "Scale out near the target zone; reduce if it breaks below the buy zone or VWAP")
+      .replaceAll("午盘突破后若量能衰减，可在目标区分批卖出", "After a midday breakout, scale out near target if volume fades")
+      .replaceAll("尾盘确认失败或跌回 VWAP，优先退出观察", "If late confirmation fails or price falls back below VWAP, step aside first")
+      .replaceAll("只适合反弹观察；不能站稳 VWAP 就不持有", "Only a bounce watch; do not hold if it cannot stay above VWAP")
+      .replaceAll("达到目标区或跌破失效线时重新评估", "Reassess when target is reached or invalidation breaks")
+      .replaceAll("失效线", "Invalidation")
+      .replaceAll("观察区", "Observe zone")
+      .replaceAll("24小时", "24h");
+  }
   return String(value || "")
     .replaceAll("VWAP", "平均成本线")
     .replaceAll("pullback", "回落确认")
@@ -348,6 +645,29 @@ function plainText(value) {
     .replaceAll("减仓", "卖出一部分")
     .replaceAll("退出观察", "先退出/先不看多")
     .replaceAll("不持有", "先不持有");
+}
+
+function reasonText(value) {
+  if (state.lang !== "en") {
+    return value;
+  }
+  return String(value || "")
+    .replace(/当日涨幅 ([+-]?\d+\.?\d*)%/, "Today's move $1%")
+    .replace(/盘中强度 ([+-]?\d+\.?\d*)%/, "Intraday strength $1%")
+    .replace(/开盘跳空 ([+-]?\d+\.?\d*)%/, "Opening gap $1%")
+    .replace("价格靠近日内高位", "Price is near the intraday high")
+    .replace(/(\d+) 个数据源确认/, "$1 providers confirmed")
+    .replace("数据完整度较高", "Good data completeness");
+}
+
+function macroText(value) {
+  if (state.lang !== "en") {
+    return value;
+  }
+  return String(value || "")
+    .replace("AI/chip headline tailwind; watch for sector-wide rotation.", "AI/chip headline tailwind; watch for sector-wide rotation.")
+    .replace("Macro backdrop: General market.", "Macro backdrop: General market.")
+    .replace("No clear macro theme", "No clear macro theme");
 }
 
 function addAlert() {
@@ -427,32 +747,32 @@ function playAlertTone() {
 
 async function requestNotificationPermission() {
   if (!("Notification" in window)) {
-    els.freshness.textContent = "当前浏览器不支持系统通知";
+    els.freshness.textContent = t("notificationUnsupported");
     return;
   }
   const permission = await Notification.requestPermission();
-  els.freshness.textContent = permission === "granted" ? "价格警报通知已开启" : "通知未开启，仍会页面内提示";
+  els.freshness.textContent = permission === "granted" ? t("notificationOn") : t("notificationOff");
 }
 
 function renderAlerts() {
   if (!state.alerts.length) {
-    els.alerts.innerHTML = `<div class="empty-alert">No alerts</div>`;
+    els.alerts.innerHTML = `<div class="empty-alert">${escapeHtml(t("noAlerts"))}</div>`;
     return;
   }
   els.alerts.innerHTML = state.alerts
     .map((alert) => {
       const status = alert.triggered ? "triggered" : "armed";
-      const side = alert.side === "buy" ? "BUY" : "SELL";
+      const side = alert.side === "buy" ? t("buy").toUpperCase() : t("sell").toUpperCase();
       return `
         <div class="alert-item ${status}">
           <div>
             <strong>${escapeHtml(alert.symbol)} ${side}</strong>
             <span>${escapeHtml(alert.condition)} ${formatMoney(alert.price)}</span>
-            <small>${alert.triggered ? "Triggered" : "Armed"}</small>
+            <small>${alert.triggered ? escapeHtml(t("triggered")) : escapeHtml(t("armed"))}</small>
           </div>
           <div class="alert-actions">
-            <button type="button" title="重新启用" data-alert-action="reset" data-alert-id="${escapeHtml(alert.id)}">↻</button>
-            <button type="button" title="删除" data-alert-action="delete" data-alert-id="${escapeHtml(alert.id)}">×</button>
+            <button type="button" title="${escapeHtml(t("resetAlert"))}" data-alert-action="reset" data-alert-id="${escapeHtml(alert.id)}">↻</button>
+            <button type="button" title="${escapeHtml(t("deleteAlert"))}" data-alert-action="delete" data-alert-id="${escapeHtml(alert.id)}">×</button>
           </div>
         </div>
       `;
@@ -493,7 +813,7 @@ function saveAlerts() {
 function newsCell(symbol, newsItems) {
   const items = Array.isArray(newsItems) ? newsItems.filter(Boolean) : [];
   if (!items.length) {
-    return `<span class="muted">No recent headline</span>`;
+    return `<span class="muted">${escapeHtml(t("noNews"))}</span>`;
   }
   const selected = Math.min(state.newsSlides[symbol] || 0, items.length - 1);
   const news = items[selected];
@@ -504,9 +824,9 @@ function newsCell(symbol, newsItems) {
     items.length > 1
       ? `
         <div class="news-controls" aria-label="${escapeHtml(symbol)} news controls">
-          <button type="button" title="上一条新闻" data-news-dir="-1" data-symbol="${escapeHtml(symbol)}">‹</button>
+          <button type="button" title="${escapeHtml(t("previousNews"))}" data-news-dir="-1" data-symbol="${escapeHtml(symbol)}">‹</button>
           <span>${selected + 1} / ${items.length}</span>
-          <button type="button" title="下一条新闻" data-news-dir="1" data-symbol="${escapeHtml(symbol)}">›</button>
+          <button type="button" title="${escapeHtml(t("nextNews"))}" data-news-dir="1" data-symbol="${escapeHtml(symbol)}">›</button>
         </div>
       `
       : "";
