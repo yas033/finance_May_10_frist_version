@@ -6,6 +6,7 @@ const state = {
   audioContext: null,
   newsSlides: {},
   lang: localStorage.getItem("quant-lang") || "zh",
+  theme: localStorage.getItem("quant-theme") || "light",
 };
 
 const els = {
@@ -30,6 +31,7 @@ const els = {
   topPick: document.querySelector("#topPick"),
   topScore: document.querySelector("#topScore"),
   langOptions: document.querySelectorAll("[data-lang]"),
+  themeOptions: document.querySelectorAll("[data-theme-choice]"),
 };
 
 const I18N = {
@@ -38,6 +40,8 @@ const I18N = {
     waiting: "等待数据",
     connecting: "正在连接实时行情...",
     connectingDetails: "首次打开免费服务器可能需要几十秒。",
+    lightTheme: "浅色",
+    darkTheme: "深色",
     watchlist: "股票池",
     rankLimit: "榜单数量",
     refreshSeconds: "刷新秒数",
@@ -108,6 +112,8 @@ const I18N = {
     waiting: "Waiting for data",
     connecting: "Connecting to live market data...",
     connectingDetails: "First load on the free server can take a few dozen seconds.",
+    lightTheme: "Light",
+    darkTheme: "Dark",
     watchlist: "Watchlist",
     rankLimit: "Rank limit",
     refreshSeconds: "Refresh seconds",
@@ -193,6 +199,15 @@ function setLanguage(lang) {
   }
 }
 
+function setTheme(theme) {
+  if (!["light", "dark"].includes(theme) || state.theme === theme) {
+    return;
+  }
+  state.theme = theme;
+  localStorage.setItem("quant-theme", theme);
+  applyTheme();
+}
+
 function applyLanguage() {
   document.documentElement.lang = state.lang === "zh" ? "zh-CN" : "en";
   document.querySelectorAll("[data-i18n]").forEach((node) => {
@@ -210,8 +225,16 @@ function applyLanguage() {
   els.pause.title = state.paused ? t("resumeRefresh") : t("pauseRefresh");
 }
 
+function applyTheme() {
+  document.documentElement.dataset.theme = state.theme;
+  els.themeOptions.forEach((button) => {
+    button.classList.toggle("active", button.dataset.themeChoice === state.theme);
+  });
+}
+
 async function init() {
   applyLanguage();
+  applyTheme();
   const config = await fetchJson("/api/config");
   els.symbols.value = config.watchlist.join(", ");
   bindEvents();
@@ -237,6 +260,9 @@ function bindEvents() {
   els.rankings.addEventListener("click", handleNewsNav);
   els.langOptions.forEach((button) => {
     button.addEventListener("click", () => setLanguage(button.dataset.lang));
+  });
+  els.themeOptions.forEach((button) => {
+    button.addEventListener("click", () => setTheme(button.dataset.themeChoice));
   });
 }
 
