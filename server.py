@@ -31,7 +31,7 @@ class QuantHandler(SimpleHTTPRequestHandler):
             self.write_json(
                 {
                     "watchlist": DEFAULT_WATCHLIST,
-                    "providers": ["Yahoo Finance", "Alpha Vantage", "Polygon", "Finnhub"],
+                    "providers": ["Yahoo Finance"],
                 }
             )
             return

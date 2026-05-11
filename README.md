@@ -33,16 +33,7 @@ python3 server.py
 http://127.0.0.1:8765
 ```
 
-可选 API Key：
-
-```bash
-export ALPHA_VANTAGE_API_KEY="你的 Alpha Vantage key"
-export POLYGON_API_KEY="你的 Polygon key"
-export FINNHUB_API_KEY="你的 Finnhub key"
-python3 server.py
-```
-
-未配置 API Key 时，网站仍会尝试 Yahoo Finance 的公开行情接口；其他数据源会显示为未启用。实际是否能做到每秒真实更新，取决于数据套餐、交易时段、限流和交易所授权。
+网站使用 Yahoo Finance 的公开行情接口，不需要配置额外 API Key。实际是否能做到每秒真实更新，取决于 Yahoo Finance、交易时段、限流和交易所授权。
 
 实时榜单里的“Next-day score”是模型评分，不是第二天必涨的承诺。当前评分综合了当日涨幅、盘中强度、开盘跳空、日内区间位置、成交量量级和多数据源一致性。
 
@@ -62,9 +53,6 @@ Docker 部署：
 docker build -t quant-stock-tool .
 docker run -p 8765:8765 \
   -e HOST=0.0.0.0 \
-  -e FINNHUB_API_KEY="你的 Finnhub key" \
-  -e ALPHA_VANTAGE_API_KEY="你的 Alpha Vantage key" \
-  -e POLYGON_API_KEY="你的 Polygon key" \
   quant-stock-tool
 ```
 
@@ -99,7 +87,7 @@ python3 -m quanttool.cli backtest \
 
 ## 后续可以扩展
 
-- 接入数据源：Polygon、Alpha Vantage、Yahoo Finance、Tushare、AkShare
+- 接入更多可承受的数据源：交易所授权行情、券商行情、或合适的付费 API
 - 策略库：动量、均值回归、多因子、配对交易
 - 投组层：多股票调仓、行业/因子暴露约束
 - 模拟交易：记录订单、成交、持仓和每日权益

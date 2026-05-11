@@ -156,12 +156,9 @@ class LiveMarketScanner:
 
         jobs = [
             ("yahoo", lambda: self.fetch_yahoo(cleaned)),
-            ("alpha_vantage", lambda: self.fetch_alpha_vantage(cleaned[:25])),
-            ("polygon", lambda: self.fetch_polygon(cleaned)),
-            ("finnhub", lambda: self.fetch_finnhub(cleaned[:60])),
         ]
 
-        with ThreadPoolExecutor(max_workers=4) as executor:
+        with ThreadPoolExecutor(max_workers=len(jobs)) as executor:
             futures = {executor.submit(run_provider, job): name for name, job in jobs}
             for future in as_completed(futures):
                 provider = futures[future]
@@ -185,8 +182,7 @@ class LiveMarketScanner:
             "providers": [asdict(status) for status in statuses],
             "notes": [
                 "排名是模型评分，不是收益承诺。",
-                "页面可以每秒刷新；实际行情新鲜度取决于数据源套餐、交易时段和限流。",
-                "未配置 API Key 时，Alpha Vantage、Polygon、Finnhub 会显示为未启用。",
+                "页面可以每秒刷新；实际行情新鲜度取决于 Yahoo Finance、交易时段和限流。",
             ],
         }
 
