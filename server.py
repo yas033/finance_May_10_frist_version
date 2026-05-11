@@ -77,6 +77,7 @@ def main() -> None:
     port = int(os.getenv("PORT", "8765"))
     server = ThreadingHTTPServer((host, port), QuantHandler)
     print(f"Quant Stock Tool running at http://{host}:{port}")
+    print(f"Static root: {WEB_ROOT} exists={WEB_ROOT.exists()}")
     server.serve_forever()
 
 
