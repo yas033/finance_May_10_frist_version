@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quant Stock Live Scanner</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">US Equities Live Scanner</p>
+        <h1>美股实时量化筛选</h1>
+      </div>
+      <div class="market-clock">
+        <span id="clock">--:--:--</span>
+        <span id="freshness">等待数据</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="control-panel" aria-label="Scanner controls">
+        <div class="field">
+          <label for="symbols">股票池</label>
+          <textarea id="symbols" spellcheck="false"></textarea>
+        </div>
+        <div class="control-row">
+          <label for="limit">榜单数量</label>
+          <input id="limit" type="number" min="5" max="100" value="30" />
+        </div>
+        <div class="control-row">
+          <label for="interval">刷新秒数</label>
+          <input id="interval" type="number" min="1" max="60" value="1" />
+        </div>
+        <div class="button-row">
+          <button id="scanNow" type="button" title="立即刷新">↻</button>
+          <button id="pause" type="button" title="暂停刷新">⏸</button>
+        </div>
+        <div class="alert-panel">
+          <div class="panel-title">
+            <strong>Price alerts</strong>
+            <button id="notifyPermission" type="button" title="允许浏览器通知">🔔</button>
+          </div>
+          <div class="alert-grid">
+            <input id="alertSymbol" type="text" placeholder="Symbol" />
+            <select id="alertSide" aria-label="Alert side">
+              <option value="buy">Buy</option>
+              <option value="sell">Sell</option>
+            </select>
+            <select id="alertCondition" aria-label="Alert condition">
+              <option value="<=">≤</option>
+              <option value=">=">≥</option>
+            </select>
+            <input id="alertPrice" type="number" step="0.01" min="0" placeholder="Price" />
+          </div>
+          <button id="addAlert" class="wide-button" type="button">Add alert</button>
+          <div id="alerts" class="alerts-list"></div>
+        </div>
+        <div class="glossary-panel" aria-label="Beginner glossary">
+          <div class="panel-title">
+            <strong>新手词典</strong>
+          </div>
+          <div class="term-list">
+            <div><strong>VWAP</strong><span>当天平均成本线，价格在它上方通常更强。</span></div>
+            <div><strong>回踩</strong><span>先涨后回落，等它跌回关键位置附近再观察。</span></div>
+            <div><strong>横盘企稳</strong><span>价格在小范围里走，不再明显往下掉。</span></div>
+            <div><strong>不追高</strong><span>刚冲太快时先别急，等回落或确认。</span></div>
+            <div><strong>失效线</strong><span>跌破这里，原来的买入理由先取消。</span></div>
+            <div><strong>分批止盈</strong><span>涨到目标区先卖一部分，别一次赌到底。</span></div>
+          </div>
+        </div>
+        <div class="provider-list" id="providers"></div>
+        <div class="notice">
+          <strong>说明</strong>
+          <p>评分是强弱排序，不是第二天 100% 上涨概率。买卖区间是观察建议，不是收益保证或下单指令。</p>
+        </div>
+      </section>
+
+      <section class="scanner">
+        <div class="summary-band">
+          <div>
+            <span class="metric-label">股票池</span>
+            <strong id="universeSize">0</strong>
+          </div>
+          <div>
+            <span class="metric-label">Top pick</span>
+            <strong id="topPick">--</strong>
+          </div>
+          <div>
+            <span class="metric-label">信号强度</span>
+            <strong id="topScore">--</strong>
+          </div>
+        </div>
+        <div class="context-strip" id="marketContext"></div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Symbol</th>
+                <th>Price</th>
+                <th>Today</th>
+                <th>Momentum score</th>
+                <th>Entry window</th>
+                <th>Buy zone</th>
+                <th>Sell zone</th>
+                <th>Macro reason</th>
+                <th>Latest news</th>
+                <th>Signal</th>
+                <th>Trend</th>
+                <th>Reasons</th>
+              </tr>
+            </thead>
+            <tbody id="rankings">
+              <tr>
+                <td colspan="8" class="empty">正在加载实时榜单...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

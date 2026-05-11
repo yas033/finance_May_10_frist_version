@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: finance-trysql-us
+    env: python
+    plan: starter
+    buildCommand: ""
+    startCommand: HOST=0.0.0.0 python server.py
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: ALPHA_VANTAGE_API_KEY
+        sync: false
+      - key: POLYGON_API_KEY
+        sync: false
+      - key: FINNHUB_API_KEY
+        sync: false
