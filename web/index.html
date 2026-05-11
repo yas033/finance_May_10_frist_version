@@ -19,7 +19,7 @@
         </div>
         <div class="market-clock">
           <span id="clock">--:--:--</span>
-          <span id="freshness" data-i18n="waiting">等待数据</span>
+          <span id="freshness" data-i18n="connecting">正在连接实时行情...</span>
         </div>
       </div>
     </header>
@@ -75,7 +75,16 @@
             <div><strong data-i18n="termScaleName">分批止盈</strong><span data-i18n="termScale">涨到目标区先卖一部分，别一次赌到底。</span></div>
           </div>
         </div>
-        <div class="provider-list" id="providers"></div>
+        <div class="provider-list" id="providers">
+          <div class="provider connecting-provider">
+            <span class="dot loading-dot"></span>
+            <div>
+              <span data-i18n="connecting">正在连接实时行情...</span>
+              <br />
+              <small data-i18n="connectingDetails">首次打开免费服务器可能需要几十秒。</small>
+            </div>
+          </div>
+        </div>
         <div class="notice">
           <strong data-i18n="noticeTitle">说明</strong>
           <p data-i18n="noticeBody">评分是强弱排序，不是第二天 100% 上涨概率。买卖区间是观察建议，不是收益保证或下单指令。</p>
@@ -120,7 +129,7 @@
             </thead>
             <tbody id="rankings">
               <tr>
-                <td colspan="13" class="empty" data-i18n="loadingRankings">正在加载实时榜单...</td>
+                <td colspan="13" class="empty" data-i18n="connectingRankings">正在连接数据源并加载实时榜单...</td>
               </tr>
             </tbody>
           </table>

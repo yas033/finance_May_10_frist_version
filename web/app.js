@@ -36,6 +36,8 @@ const I18N = {
   zh: {
     title: "美股实时量化筛选",
     waiting: "等待数据",
+    connecting: "正在连接实时行情...",
+    connectingDetails: "首次打开免费服务器可能需要几十秒。",
     watchlist: "股票池",
     rankLimit: "榜单数量",
     refreshSeconds: "刷新秒数",
@@ -79,6 +81,7 @@ const I18N = {
     trend: "走势",
     reasons: "理由",
     loadingRankings: "正在加载实时榜单...",
+    connectingRankings: "正在连接数据源并加载实时榜单...",
     loading: "刷新中...",
     refreshFailed: "刷新失败",
     connectionFailed: "连接失败",
@@ -103,6 +106,8 @@ const I18N = {
   en: {
     title: "US Stock Live Quant Scanner",
     waiting: "Waiting for data",
+    connecting: "Connecting to live market data...",
+    connectingDetails: "First load on the free server can take a few dozen seconds.",
     watchlist: "Watchlist",
     rankLimit: "Rank limit",
     refreshSeconds: "Refresh seconds",
@@ -146,6 +151,7 @@ const I18N = {
     trend: "Trend",
     reasons: "Reasons",
     loadingRankings: "Loading live rankings...",
+    connectingRankings: "Connecting to data sources and loading live rankings...",
     loading: "Refreshing...",
     refreshFailed: "Refresh failed",
     connectionFailed: "Connection failed",
@@ -250,7 +256,7 @@ function schedule() {
 
 async function scan() {
   try {
-    els.freshness.textContent = t("loading");
+    setConnectingState();
     const params = new URLSearchParams({
       symbols: els.symbols.value,
       limit: els.limit.value || "30",
@@ -262,6 +268,24 @@ async function scan() {
     els.freshness.textContent = t("refreshFailed");
     els.providers.innerHTML = `<div class="provider"><span class="dot fail"></span><div>${escapeHtml(t("connectionFailed"))}<br><small>${escapeHtml(error.message)}</small></div></div>`;
   }
+}
+
+function setConnectingState() {
+  els.freshness.textContent = state.lastData ? t("loading") : t("connecting");
+  if (state.lastData) {
+    return;
+  }
+  els.providers.innerHTML = `
+    <div class="provider connecting-provider">
+      <span class="dot loading-dot"></span>
+      <div>
+        ${escapeHtml(t("connecting"))}
+        <br />
+        <small>${escapeHtml(t("connectingDetails"))}</small>
+      </div>
+    </div>
+  `;
+  els.rankings.innerHTML = `<tr><td colspan="13" class="empty">${escapeHtml(t("connectingRankings"))}</td></tr>`;
 }
 
 async function fetchJson(url) {

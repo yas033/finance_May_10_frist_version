@@ -362,6 +362,29 @@ button:hover {
   background: var(--red);
 }
 
+.loading-dot {
+  animation: pulse 1s ease-in-out infinite;
+  background: var(--blue);
+}
+
+.connecting-provider {
+  border-color: #bfd0ff;
+  background: #f7f9ff;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .provider small {
   color: var(--muted);
 }
